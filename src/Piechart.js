@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import _ from "lodash";
 import * as d3 from "d3";
 import * as chroma from "chroma-js";
+import styled from "styled-components";
+
+const Arc = styled.path`
+    cursor: pointer;
+`;
 
 class Piechart extends Component {
     pie = d3
@@ -15,6 +20,10 @@ class Piechart extends Component {
         .outerRadius(150)
         .cornerRadius(8);
     color = chroma.scale("PuBu");
+
+    clickArc({ data: { tag, amount } }) {
+        console.log(`$${amount} for ${tag} in the last 12 months`);
+    }
 
     render() {
         const { data, groupBy, x, y } = this.props;
@@ -31,11 +40,12 @@ class Piechart extends Component {
             <g transform={`translate(${x}, ${y})`}>
                 {this.pie(_data).map((d, i) => (
                     <g>
-                        <path
+                        <Arc
                             d={this.arc(d)}
                             style={{
                                 fill: this.color(i / Object.keys(_data).length)
                             }}
+                            onClick={() => this.clickArc(d)}
                         />
                     </g>
                 ))}
