@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import * as d3 from "d3";
-import * as chroma from "chroma-js";
 import styled from "styled-components";
 
 const SArc = styled.path`
@@ -30,9 +29,6 @@ class Arc extends Component {
 
     click = () => {
         const { data: { tag, amount } } = this.props.d;
-        console.log(
-            `$${Math.round(amount, 2)} for ${tag} in the last 12 months`
-        );
     };
 
     hover = () => {
@@ -50,8 +46,6 @@ class Arc extends Component {
     render() {
         const { d } = this.props;
         const { color } = this.state;
-
-        console.log(color);
 
         return (
             <SArc
@@ -73,10 +67,9 @@ class Piechart extends Component {
         .value(d => d.amount)
         .sortValues(d => d.tag)
         .padAngle(0.005);
-    color = chroma.scale("PuBu");
 
     render() {
-        const { data, groupBy, x, y } = this.props;
+        const { data, groupBy, x, y, color } = this.props;
 
         const _data = Object.entries(_.groupBy(data, groupBy)).map(
             ([tag, values]) => ({
@@ -84,17 +77,12 @@ class Piechart extends Component {
                 amount: values.map(d => d.amount).reduce((m, n) => m + n, 0)
             })
         );
-        this.color.colors(Object.keys(_data).length);
 
         return (
             <g transform={`translate(${x}, ${y})`}>
                 {this.pie(_data).map((d, i) => (
-                    <g>
-                        <Arc
-                            d={d}
-                            color={this.color(i / Object.keys(_data).length)}
-                            key={d.data.tag}
-                        />
+                    <g key={d.data.tag}>
+                        <Arc d={d} color={color(d)} />
                     </g>
                 ))}
             </g>
