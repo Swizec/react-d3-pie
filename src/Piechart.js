@@ -7,6 +7,17 @@ const SArc = styled.path`
     cursor: pointer;
 `;
 
+// borrowed from http://bl.ocks.org/mbostock/5100636
+function arcTween(oldD, newD, arc) {
+    return function(d) {
+        var interpolate = d3.interpolate(oldD.endAngle, newD.endAngle);
+        return function(t) {
+            oldD.endAngle = interpolate(t);
+            return arc(oldD);
+        };
+    };
+}
+
 class Arc extends Component {
     arc = d3
         .arc()
@@ -20,7 +31,7 @@ class Arc extends Component {
         this.state = {
             color: props.color,
             origCol: props.color,
-            _pathD: this.arc(props.d)
+            d: props.d
         };
     }
 
@@ -29,17 +40,15 @@ class Arc extends Component {
             color: newProps.color
         });
 
-        const pathD = this.arc(newProps.d);
-
         d3
             .select(this.refs.elem)
             .transition()
             .duration(50)
             .ease(d3.easeCubicInOut)
-            .attr("d", pathD)
+            .attrTween("d", arcTween(this.state.d, newProps.d, this.arc))
             .on("end", () =>
                 this.setState({
-                    pathD
+                    d: newProps.d
                 })
             );
     }
