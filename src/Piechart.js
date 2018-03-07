@@ -19,12 +19,33 @@ class Arc extends Component {
 
         this.state = {
             color: props.color,
-            origCol: props.color
+            origCol: props.color,
+            _pathD: this.arc(props.d)
         };
     }
 
     componentWillReceiveProps(newProps) {
-        this.setState({ color: newProps.color });
+        this.setState({
+            color: newProps.color
+        });
+
+        const pathD = this.arc(newProps.d);
+
+        d3
+            .select(this.refs.elem)
+            .transition()
+            .duration(50)
+            .ease(d3.easeCubicInOut)
+            .attr("d", pathD)
+            .on("end", () =>
+                this.setState({
+                    pathD
+                })
+            );
+    }
+
+    componentDidUpdate() {
+        const { _pathD } = this.state;
     }
 
     click = () => {
@@ -44,18 +65,18 @@ class Arc extends Component {
     };
 
     render() {
-        const { d } = this.props;
-        const { color } = this.state;
+        const { color, pathD } = this.state;
 
         return (
-            <SArc
-                d={this.arc(d)}
+            <path
+                d={pathD}
                 style={{
                     fill: color
                 }}
                 onClick={this.click}
                 onMouseOver={this.hover}
                 onMouseOut={this.unhover}
+                ref="elem"
             />
         );
     }
