@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { csv as d3Csv } from "d3-request";
-import { timer as d3Timer, scaleOrdinal } from "d3";
+import { scaleOrdinal } from "d3";
 import * as chroma from "chroma-js";
 import _ from "lodash";
 
@@ -59,7 +59,7 @@ class App extends Component {
             } else {
                 this.stop();
             }
-        }, 80);
+        }, 120);
     }
 
     componentWillUnmount() {

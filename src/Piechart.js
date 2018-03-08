@@ -4,14 +4,17 @@ import * as d3 from "d3";
 import { groupByFunc } from "./util";
 
 // borrowed from http://bl.ocks.org/mbostock/5100636
-function arcTween(oldD, newD, arc) {
-    const copy = { ...oldD };
-    return function(d) {
+function arcTween(oldData, newData, arc) {
+    const copy = { ...oldData };
+    return function() {
         const interpolateStartAngle = d3.interpolate(
-                oldD.startAngle,
-                newD.startAngle
+                oldData.startAngle,
+                newData.startAngle
             ),
-            interpolateEndAngle = d3.interpolate(oldD.endAngle, newD.endAngle);
+            interpolateEndAngle = d3.interpolate(
+                oldData.endAngle,
+                newData.endAngle
+            );
 
         return function(t) {
             copy.startAngle = interpolateStartAngle(t);
@@ -34,19 +37,21 @@ class Arc extends Component {
         this.state = {
             color: props.color,
             origCol: props.color,
-            d: props.d
+            d: props.d,
+            pathD: this.arc(props.d)
         };
     }
 
     componentWillReceiveProps(newProps) {
         this.setState({
-            color: newProps.color
+            color: newProps.color,
+            pathD: this.arc(newProps.d)
         });
 
         d3
             .select(this.refs.elem)
             .transition()
-            .duration(30)
+            .duration(80)
             .attrTween("d", arcTween(this.state.d, newProps.d, this.arc))
             .on("end", () =>
                 this.setState({
