@@ -1,19 +1,22 @@
 import React, { Component } from "react";
-import _ from "lodash";
 import * as d3 from "d3";
-import styled from "styled-components";
 
-const SArc = styled.path`
-    cursor: pointer;
-`;
+import { groupByFunc } from "./util";
 
 // borrowed from http://bl.ocks.org/mbostock/5100636
 function arcTween(oldD, newD, arc) {
+    const copy = { ...oldD };
     return function(d) {
-        var interpolate = d3.interpolate(oldD.endAngle, newD.endAngle);
+        const interpolateStartAngle = d3.interpolate(
+                oldD.startAngle,
+                newD.startAngle
+            ),
+            interpolateEndAngle = d3.interpolate(oldD.endAngle, newD.endAngle);
+
         return function(t) {
-            oldD.endAngle = interpolate(t);
-            return arc(oldD);
+            copy.startAngle = interpolateStartAngle(t);
+            copy.endAngle = interpolateEndAngle(t);
+            return arc(copy);
         };
     };
 }
@@ -43,12 +46,12 @@ class Arc extends Component {
         d3
             .select(this.refs.elem)
             .transition()
-            .duration(50)
-            .ease(d3.easeCubicInOut)
+            .duration(30)
             .attrTween("d", arcTween(this.state.d, newProps.d, this.arc))
             .on("end", () =>
                 this.setState({
-                    d: newProps.d
+                    d: newProps.d,
+                    pathD: this.arc(newProps.d)
                 })
             );
     }
@@ -101,12 +104,7 @@ class Piechart extends Component {
     render() {
         const { data, groupBy, x, y, color } = this.props;
 
-        const _data = Object.entries(_.groupBy(data, groupBy)).map(
-            ([tag, values]) => ({
-                tag,
-                amount: values.map(d => d.amount).reduce((m, n) => m + n, 0)
-            })
-        );
+        const _data = groupByFunc(data, groupBy);
 
         return (
             <g transform={`translate(${x}, ${y})`}>
@@ -115,6 +113,10 @@ class Piechart extends Component {
                         <Arc d={d} color={color(d)} />
                     </g>
                 ))}
+                <text x="-10">{data.length}</text>
+                <text y="15" x="-40">
+                    datapoints
+                </text>
             </g>
         );
     }

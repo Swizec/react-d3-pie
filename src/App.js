@@ -6,6 +6,7 @@ import _ from "lodash";
 
 import logo from "./logo.svg";
 import "./App.css";
+import { groupByFunc } from "./util";
 
 import Piechart from "./Piechart";
 
@@ -31,20 +32,15 @@ class App extends Component {
                 // borrowed from Piechart, should be utility func
                 // Setting color scale here ensures color->tag mapping is stable
                 const tags = Object.keys(
-                    Object.entries(
-                        _.groupBy(cachedData, d => d.Tags.split(", ").sort())
-                    ).map(([tag, values]) => ({
-                        tag,
-                        amount: values
-                            .map(d => d.amount)
-                            .reduce((m, n) => m + n, 0)
-                    }))
+                    groupByFunc(cachedData, d => d.Tags.split(", ").sort())
                 );
 
                 this.colorScale.colors(tags);
                 this.colorIndex
                     .domain(tags)
                     .range(tags.map((_, i) => i / tags.length));
+
+                console.log(cachedData);
 
                 this.setState({
                     cachedData,
@@ -56,7 +52,7 @@ class App extends Component {
     }
 
     startTrickle() {
-        this.timer = d3Timer(() => {
+        this.timer = setInterval(() => {
             let { data, cachedData, cacheIndex } = this.state;
 
             if (cacheIndex < cachedData.length) {
@@ -67,15 +63,15 @@ class App extends Component {
             } else {
                 this.stop();
             }
-        }, 150);
+        }, 80);
     }
 
     componentWillUnmount() {
-        this.stop();
+        clearInterval(this.timer);
     }
 
     stop() {
-        this.timer.stop();
+        clearInterval(this.timer);
     }
 
     color(tag) {
