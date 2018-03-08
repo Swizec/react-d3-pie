@@ -29,8 +29,6 @@ class App extends Component {
                     console.error(error);
                 }
 
-                // borrowed from Piechart, should be utility func
-                // Setting color scale here ensures color->tag mapping is stable
                 const tags = Object.keys(
                     groupByFunc(cachedData, d => d.Tags.split(", ").sort())
                 );
@@ -39,8 +37,6 @@ class App extends Component {
                 this.colorIndex
                     .domain(tags)
                     .range(tags.map((_, i) => i / tags.length));
-
-                console.log(cachedData);
 
                 this.setState({
                     cachedData,
@@ -85,9 +81,7 @@ class App extends Component {
             <div className="App">
                 <header className="App-header">
                     <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title">
-                        A pie chart with transitions and sane click events
-                    </h1>
+                    <h1 className="App-title">A pie chart with transitions</h1>
                 </header>
                 <p className="App-intro">
                     <svg width="800" height="600">

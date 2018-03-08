@@ -56,14 +56,6 @@ class Arc extends Component {
             );
     }
 
-    componentDidUpdate() {
-        const { _pathD } = this.state;
-    }
-
-    click = () => {
-        const { data: { tag, amount } } = this.props.d;
-    };
-
     hover = () => {
         this.setState({
             color: this.state.color.saturate(2)
@@ -85,7 +77,6 @@ class Arc extends Component {
                 style={{
                     fill: color
                 }}
-                onClick={this.click}
                 onMouseOver={this.hover}
                 onMouseOut={this.unhover}
                 ref="elem"
@@ -113,8 +104,10 @@ class Piechart extends Component {
                         <Arc d={d} color={color(d)} />
                     </g>
                 ))}
-                <text x="-10">{data.length}</text>
-                <text y="15" x="-40">
+                <text x="0" textAnchor="middle">
+                    {data.length}
+                </text>
+                <text y="18" x="0" textAnchor="middle">
                     datapoints
                 </text>
             </g>
