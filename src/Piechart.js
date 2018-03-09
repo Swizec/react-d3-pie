@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 import { groupByFunc } from "./util";
 
-// borrowed from http://bl.ocks.org/mbostock/5100636
+// inspired from http://bl.ocks.org/mbostock/5100636
 function arcTween(oldData, newData, arc) {
     const copy = { ...oldData };
     return function() {
@@ -44,19 +44,19 @@ class Arc extends Component {
 
     componentWillReceiveProps(newProps) {
         this.setState({
-            color: newProps.color,
-            pathD: this.arc(newProps.d)
+            color: newProps.color
         });
 
         d3
             .select(this.refs.elem)
             .transition()
             .duration(80)
-            .attrTween("d", arcTween(this.state.d, newProps.d, this.arc))
+            .attr("d", this.arc(newProps.d))
+            //.attrTween("d", arcTween(this.state.d, newProps.d, this.arc))
             .on("end", () =>
                 this.setState({
-                    d: newProps.d,
-                    pathD: this.arc(newProps.d)
+                    d: newProps.d
+                    //pathD: this.arc(newProps.d)
                 })
             );
     }
@@ -105,9 +105,7 @@ class Piechart extends Component {
         return (
             <g transform={`translate(${x}, ${y})`}>
                 {this.pie(_data).map((d, i) => (
-                    <g key={d.data.tag}>
-                        <Arc d={d} color={color(d)} />
-                    </g>
+                    <Arc d={d} color={color(d)} key={d.data.tag} />
                 ))}
                 <text x="0" textAnchor="middle">
                     {data.length}

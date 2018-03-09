@@ -59,7 +59,7 @@ class App extends Component {
             } else {
                 this.stop();
             }
-        }, 120);
+        }, 100);
     }
 
     componentWillUnmount() {
